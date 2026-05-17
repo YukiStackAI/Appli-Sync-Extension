@@ -6,7 +6,7 @@
 // ─── Supabase Config (hardcoded fallbacks) ────────────────────
 const SUPABASE_URL     = 'https://fzzgoimfokcqpejnbrdx.supabase.co';
 const SUPABASE_ANON    = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ6emdvaW1mb2tjcXBlam5icmR4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkwMTk1MzgsImV4cCI6MjA5NDU5NTUzOH0.N1jkw0yqbVgHLAELuRUBtWkPDfSUeSPkYRTXeg1hnaM';
-const BACKEND_URL      = 'http://localhost:8000'; // e.g. https://applisync.railway.app
+const BACKEND_URL      = 'https://applisync-backend.onrender.com';
 
 // ─── Supabase Helpers ─────────────────────────────────────────
 
