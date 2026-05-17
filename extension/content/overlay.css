@@ -309,7 +309,7 @@
 
 /* ── Auth Gate ── */
 #as-auth-gate {
-  display: flex !important;
+  display: flex;
   flex-direction: column !important;
   gap: 8px !important;
 }

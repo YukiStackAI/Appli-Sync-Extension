@@ -391,6 +391,57 @@
     btn.textContent = '⟳ Saving...';
     btn.disabled    = true;
 
+    // Build beautiful consolidated notes line-by-line
+    const notesParts = [];
+
+    // 1. Manual User Notes
+    const manualNotes = getField('as-f-notes')?.trim();
+    if (manualNotes) {
+      notesParts.push(`📝 Notes:\n${manualNotes}`);
+    }
+
+    // 2. Work Mode & Info
+    const mode = state.extractedData?.mode_of_work;
+    if (mode) {
+      notesParts.push(`💼 Mode of Work: ${mode}`);
+    }
+
+    const skills = state.extractedData?.skills_required;
+    if (skills) {
+      notesParts.push(`🔑 Skills Required: ${skills}`);
+    }
+
+    const impInfo = state.extractedData?.important_information;
+    if (impInfo) {
+      notesParts.push(`ℹ️ Important Information:\n${impInfo}`);
+    }
+
+    // 3. User Filled Form Fields
+    if (state.formFields && Object.keys(state.formFields).length > 0) {
+      const formLines = ["📋 Form Details Filled:"];
+      for (const [key, value] of Object.entries(state.formFields)) {
+        if (value && value.trim()) {
+          formLines.push(`   • ${key}: ${value.trim()}`);
+        }
+      }
+      if (formLines.length > 1) {
+        notesParts.push(formLines.join('\n'));
+      }
+    }
+
+    // 4. Uploaded Files
+    if (state.filesSubmitted && state.filesSubmitted.length > 0) {
+      const fileLines = ["📎 Attached Files:"];
+      state.filesSubmitted.forEach(f => {
+        if (f) fileLines.push(`   • ${f}`);
+      });
+      if (fileLines.length > 1) {
+        notesParts.push(fileLines.join('\n'));
+      }
+    }
+
+    const compiledNotes = notesParts.join('\n\n') || null;
+
     // Read edited fields from overlay inputs
     const data = {
       portal:              detectPortal(),
@@ -402,7 +453,7 @@
       posting_date:        getField('as-f-date'),
       job_description:     state.extractedData?.job_description || null,
       job_url:             location.href,
-      notes:               getField('as-f-notes'),
+      notes:               compiledNotes,
       form_fields:         state.formFields,
       files_submitted:     state.filesSubmitted,
     };

@@ -42,6 +42,7 @@ SYSTEM_PROMPT = """You are a job data extraction AI. Extract structured job info
 Return ONLY valid JSON, no markdown, no explanation. If a field cannot be found, use null.
 For experience_required: if not mentioned or says 'fresher/entry level/0 years', return "Fresher".
 For posting_date: convert relative dates like '2 weeks ago' to approximate ISO date (YYYY-MM-DD).
+For mode_of_work: determine if the job is 'hybrid', 'on-site', or 'work from home' (remote).
 For job_description: return the full JD text, max 3000 characters."""
 
 def build_prompt(text: str, url: str) -> str:
@@ -55,7 +56,10 @@ def build_prompt(text: str, url: str) -> str:
   "posting_date": "YYYY-MM-DD or null",
   "experience_required": "e.g. 2-4 years or Fresher",
   "job_description": "Full job description text",
-  "portal": "LinkedIn | Naukri | Indeed | Company Website"
+  "portal": "LinkedIn | Naukri | Indeed | Company Website",
+  "mode_of_work": "hybrid | on-site | work from home",
+  "skills_required": "Comma-separated list of key technical and soft skills",
+  "important_information": "Any crucial highlights, instructions, joining time, benefits, etc."
 }}
 
 Page URL: {url}
