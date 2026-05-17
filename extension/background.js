@@ -78,7 +78,7 @@ async function extractWithAI(html, url) {
 
   if (provider === 'groq') {
     apiKey = settings.groq_key   || '';
-    model  = settings.groq_model  || 'llama-3.1-70b-versatile';
+    model  = settings.groq_model  || 'llama-3.3-70b-versatile';
   } else if (provider === 'openai') {
     apiKey = settings.openai_key  || '';
     model  = settings.openai_model || 'gpt-4o-mini';

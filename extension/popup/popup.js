@@ -54,7 +54,7 @@ async function loadProviderPill() {
   const s   = res?.data || {};
   const map  = {
     groq_default: 'Groq (Default · Free)',
-    groq:         'Groq · ' + (s.model || 'llama-3.1-70b'),
+    groq:         'Groq · ' + (s.model || 'llama-3.3-70b'),
     ollama:       'Ollama · Local',
     openai:       'OpenAI · ' + (s.model || 'gpt-4o-mini'),
     gemini:       'Gemini · ' + (s.model || 'gemini-1.5-flash'),

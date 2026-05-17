@@ -36,7 +36,7 @@ async function loadSettings() {
 
   // Fill fields
   setValue('groq-key',          s.groq_key         || '');
-  setValue('groq-model',        s.groq_model        || 'llama-3.1-70b-versatile');
+  setValue('groq-model',        s.groq_model        || 'llama-3.3-70b-versatile');
   setValue('ollama-url',        s.ollama_url        || 'http://localhost:11434');
   setValue('ollama-model',      s.ollama_model      || 'llama3.1');
   setValue('ollama-custom',     s.ollama_custom     || '');

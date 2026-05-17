@@ -26,7 +26,7 @@ app.add_middleware(
 
 # ── Built-in Groq key (your free default) ────────────────────
 BUILTIN_GROQ_KEY   = os.getenv("GROQ_API_KEY", "")
-BUILTIN_GROQ_MODEL = "llama-3.1-70b-versatile"
+BUILTIN_GROQ_MODEL = "llama-3.3-70b-versatile"
 
 # ── Request Model ─────────────────────────────────────────────
 class ExtractRequest(BaseModel):
