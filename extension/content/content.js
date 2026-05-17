@@ -35,18 +35,9 @@
     return 'Company Website';
   }
 
-  // ─── Page HTML Extraction ────────────────────────────────────
   function getPageHTML() {
-    const clone = document.documentElement.cloneNode(true);
-    ['script','style','nav','footer','header','noscript','svg','img','iframe'].forEach(tag => {
-      clone.querySelectorAll(tag).forEach(el => el.remove());
-    });
-    let text = clone.textContent || '';
-    text = text.replace(/\s+/g, ' ').trim();
-    if (text.length < 200) {
-      text = document.body.innerText || '';
-    }
-    return text.slice(0, 15000);
+    // Send the complete raw HTML of the page so that Scrapling on the backend can clean and parse it perfectly!
+    return document.documentElement.outerHTML || document.body.innerHTML;
   }
 
   // ─── Form Field Tracker ──────────────────────────────────────
