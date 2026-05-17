@@ -115,12 +115,15 @@ async function saveApplication(data) {
   const session = await getSession();
   if (!session) throw new Error('Not signed in');
 
+  const rawDate = data.posting_date;
+  const isInvalidDate = !rawDate || rawDate.trim() === '' || rawDate.trim().toUpperCase() === 'NA' || rawDate.trim() === '—';
+
   const record = {
     user_id:             session.user.id,
     portal:              data.portal              || 'Company Website',
     company:             data.company             || 'Unknown',
     role:                data.role                || 'Unknown',
-    posting_date:        data.posting_date        || null,
+    posting_date:        isInvalidDate            ? null : rawDate.trim(),
     job_description:     data.job_description     || null,
     experience_required: data.experience_required || 'Fresher',
     applied_date:        new Date().toISOString(),
