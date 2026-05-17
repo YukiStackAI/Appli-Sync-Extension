@@ -471,6 +471,9 @@
       job_description:     state.extractedData?.job_description || null,
       job_url:             location.href,
       notes:               compiledNotes,
+      mode_of_work:          getField('as-f-mode'),
+      skills_required:       getField('as-f-skills'),
+      important_information: getField('as-f-imp'),
       form_fields:         state.formFields,
       files_submitted:     state.filesSubmitted,
     };

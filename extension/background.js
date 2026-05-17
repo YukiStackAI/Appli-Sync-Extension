@@ -129,6 +129,9 @@ async function saveApplication(data) {
     job_url:             data.job_url             || null,
     form_fields:         data.form_fields         ? JSON.stringify(data.form_fields) : null,
     files_submitted:     data.files_submitted     ? JSON.stringify(data.files_submitted) : null,
+    mode_of_work:          data.mode_of_work          || null,
+    skills_required:       data.skills_required       || null,
+    important_information: data.important_information || null,
     status:              'Applied',
     notes:               data.notes               || null,
   };
