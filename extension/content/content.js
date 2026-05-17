@@ -196,6 +196,20 @@
                 <input id="as-f-date" type="text" placeholder="—"/>
               </div>
             </div>
+            <div class="as-field-row">
+              <div class="as-field-group">
+                <label>Mode of Work</label>
+                <input id="as-f-mode" type="text" placeholder="NA"/>
+              </div>
+              <div class="as-field-group">
+                <label>Skills Required</label>
+                <input id="as-f-skills" type="text" placeholder="NA"/>
+              </div>
+            </div>
+            <div class="as-field-group">
+              <label>Important Info</label>
+              <input id="as-f-imp" type="text" placeholder="NA"/>
+            </div>
             <div class="as-field-group">
               <label>Notes</label>
               <input id="as-f-notes" type="text" placeholder="Add notes..."/>
@@ -360,12 +374,15 @@
       state.extractedData = { ...d, portal: detectPortal(), job_url: location.href };
 
       // Populate fields
-      setField('as-f-company', d.company);
-      setField('as-f-role',    d.role);
+      setField('as-f-company', d.company || 'NA');
+      setField('as-f-role',    d.role || 'NA');
       setField('as-f-exp',     d.experience_required || 'Fresher');
-      setField('as-f-loc',     d.location);
-      setField('as-f-sal',     d.salary);
-      setField('as-f-date',    d.posting_date);
+      setField('as-f-loc',     d.location || 'NA');
+      setField('as-f-sal',     d.salary || 'NA');
+      setField('as-f-date',    d.posting_date || 'NA');
+      setField('as-f-mode',    d.mode_of_work || 'NA');
+      setField('as-f-skills',  d.skills_required || 'NA');
+      setField('as-f-imp',     d.important_information || 'NA');
 
       if (d.job_description) {
         document.getElementById('as-jd-preview').textContent = d.job_description.slice(0, 600) + '...';
@@ -401,18 +418,18 @@
     }
 
     // 2. Work Mode & Info
-    const mode = state.extractedData?.mode_of_work;
-    if (mode) {
+    const mode = getField('as-f-mode')?.trim();
+    if (mode && mode !== 'NA') {
       notesParts.push(`💼 Mode of Work: ${mode}`);
     }
 
-    const skills = state.extractedData?.skills_required;
-    if (skills) {
+    const skills = getField('as-f-skills')?.trim();
+    if (skills && skills !== 'NA') {
       notesParts.push(`🔑 Skills Required: ${skills}`);
     }
 
-    const impInfo = state.extractedData?.important_information;
-    if (impInfo) {
+    const impInfo = getField('as-f-imp')?.trim();
+    if (impInfo && impInfo !== 'NA') {
       notesParts.push(`ℹ️ Important Information:\n${impInfo}`);
     }
 
