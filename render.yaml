@@ -7,6 +7,6 @@ services:
     plan: free
     envVars:
       - key: GROQ_API_KEY
-        value: gsk_3TfjBJ8qKOAZAiADifCwWGdyb3FYoe2H6tYy0TiZolV5CW2m
+        sync: false
       - key: PORT
         value: 10000
