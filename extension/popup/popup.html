@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <title>AppliSync</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="popup.css"/>
+</head>
+<body>
+<div id="app">
+
+  <!-- Auth -->
+  <div id="s-auth" class="screen">
+    <div class="auth-top">
+      <div class="logo"><div class="logo-mark">A</div><span>AppliSync</span></div>
+      <p class="sub">AI-powered job tracker</p>
+    </div>
+    <div class="form-g"><label>Email</label><input id="p-email" type="email" placeholder="you@email.com"/></div>
+    <div class="form-g"><label>Password</label><input id="p-pass" type="password" placeholder="••••••••"/></div>
+    <div id="p-err" class="err"></div>
+    <button id="p-signin" class="btn btn-primary">Sign In</button>
+    <a href="https://applli-sync.vercel.app" target="_blank" class="link">Create account →</a>
+  </div>
+
+  <!-- Main -->
+  <div id="s-main" class="screen hidden">
+    <div class="top-bar">
+      <div class="logo"><div class="logo-mark">A</div><span>AppliSync</span></div>
+      <div class="top-acts">
+        <button id="p-overlay" class="icon-btn" title="Show overlay on page">⚡</button>
+        <button id="p-settings" class="icon-btn" title="Settings">⚙</button>
+        <button id="p-dash" class="icon-btn" title="Open Dashboard">↗</button>
+        <button id="p-out" class="icon-btn" title="Sign out">⏻</button>
+      </div>
+    </div>
+
+    <!-- AI Provider pill -->
+    <div id="provider-pill">
+      <span id="provider-dot"></span>
+      <span id="provider-name">Loading...</span>
+      <a id="change-provider" href="#" class="pill-link">Change</a>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats">
+      <div class="stat"><div class="stat-v" id="st-total">—</div><div class="stat-l">Total</div></div>
+      <div class="stat"><div class="stat-v" id="st-week">—</div><div class="stat-l">This Week</div></div>
+      <div class="stat"><div class="stat-v" id="st-inter">—</div><div class="stat-l">Interviews</div></div>
+    </div>
+
+    <!-- Recent -->
+    <div class="sec-hd">
+      <span>Recent</span>
+      <a href="https://applli-sync.vercel.app/dashboard" target="_blank" class="link-sm">All →</a>
+    </div>
+    <div id="p-apps" class="apps-list"><div class="loading">Loading…</div></div>
+  </div>
+
+</div>
+<script src="popup.js"></script>
+</body>
+</html>
