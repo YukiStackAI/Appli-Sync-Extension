@@ -417,21 +417,7 @@
       notesParts.push(`📝 Notes:\n${manualNotes}`);
     }
 
-    // 2. Work Mode & Info
-    const mode = getField('as-f-mode')?.trim();
-    if (mode && mode !== 'NA') {
-      notesParts.push(`💼 Mode of Work: ${mode}`);
-    }
 
-    const skills = getField('as-f-skills')?.trim();
-    if (skills && skills !== 'NA') {
-      notesParts.push(`🔑 Skills Required: ${skills}`);
-    }
-
-    const impInfo = getField('as-f-imp')?.trim();
-    if (impInfo && impInfo !== 'NA') {
-      notesParts.push(`ℹ️ Important Information:\n${impInfo}`);
-    }
 
     // 3. User Filled Form Fields
     if (state.formFields && Object.keys(state.formFields).length > 0) {
