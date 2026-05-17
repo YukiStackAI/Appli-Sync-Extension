@@ -37,13 +37,16 @@
 
   // ─── Page HTML Extraction ────────────────────────────────────
   function getPageHTML() {
-    // Remove scripts, styles, nav, footer — keep meaningful content
     const clone = document.documentElement.cloneNode(true);
-    ['script','style','nav','footer','header','noscript','svg','img'].forEach(tag => {
+    ['script','style','nav','footer','header','noscript','svg','img','iframe'].forEach(tag => {
       clone.querySelectorAll(tag).forEach(el => el.remove());
     });
-    // Limit size to avoid huge payloads
-    return clone.innerText?.slice(0, 15000) || document.body.innerText?.slice(0, 15000);
+    let text = clone.textContent || '';
+    text = text.replace(/\s+/g, ' ').trim();
+    if (text.length < 200) {
+      text = document.body.innerText || '';
+    }
+    return text.slice(0, 15000);
   }
 
   // ─── Form Field Tracker ──────────────────────────────────────
