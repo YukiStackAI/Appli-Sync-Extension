@@ -2,7 +2,7 @@ services:
   - type: web
     name: applisync-backend
     env: docker
-    dockerFilePath: backend/Dockerfile
+    dockerfilePath: backend/Dockerfile
     dockerContext: backend
     plan: free
     envVars:
