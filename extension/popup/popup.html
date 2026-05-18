@@ -4,57 +4,102 @@
   <meta charset="UTF-8"/>
   <title>AppliSync</title>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="popup.css"/>
 </head>
 <body>
 <div id="app">
 
-  <!-- Auth -->
+  <!-- Auth Screen -->
   <div id="s-auth" class="screen">
     <div class="auth-top">
-      <div class="logo"><div class="logo-mark">A</div><span>AppliSync</span></div>
+      <div class="logo">
+        <div class="logo-mark">A</div>
+        <span>AppliSync</span>
+      </div>
       <p class="sub">AI-powered job tracker</p>
     </div>
-    <div class="form-g"><label>Email</label><input id="p-email" type="email" placeholder="you@email.com"/></div>
-    <div class="form-g"><label>Password</label><input id="p-pass" type="password" placeholder="••••••••"/></div>
+    
+    <div class="form-g">
+      <label>Email Address</label>
+      <input id="p-email" type="email" placeholder="you@email.com"/>
+    </div>
+    
+    <div class="form-g">
+      <label>Password</label>
+      <input id="p-pass" type="password" placeholder="••••••••"/>
+    </div>
+    
     <div id="p-err" class="err"></div>
-    <button id="p-signin" class="btn btn-primary">Sign In</button>
+    
+    <button id="p-signin" class="btn btn-primary">
+      <span>Sign In</span>
+      <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+    </button>
+    
     <a href="https://applli-sync.vercel.app" target="_blank" class="link">Create account →</a>
   </div>
 
-  <!-- Main -->
+  <!-- Main Screen -->
   <div id="s-main" class="screen hidden">
     <div class="top-bar">
-      <div class="logo"><div class="logo-mark">A</div><span>AppliSync</span></div>
+      <div class="logo">
+        <div class="logo-mark">A</div>
+        <span>AppliSync</span>
+      </div>
       <div class="top-acts">
-        <button id="p-overlay" class="icon-btn" title="Show overlay on page">⚡</button>
-        <button id="p-settings" class="icon-btn" title="Settings">⚙</button>
-        <button id="p-dash" class="icon-btn" title="Open Dashboard">↗</button>
-        <button id="p-out" class="icon-btn" title="Sign out">⏻</button>
+        <button id="p-overlay" class="icon-btn" title="Show overlay on page">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+        </button>
+        <button id="p-settings" class="icon-btn" title="Settings">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+        </button>
+        <button id="p-dash" class="icon-btn" title="Open Dashboard">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+        </button>
+        <button id="p-out" class="icon-btn" title="Sign out">
+          <svg class="icon logout-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+        </button>
       </div>
     </div>
 
-    <!-- AI Provider pill -->
+    <!-- AI Provider Pill -->
     <div id="provider-pill">
       <span id="provider-dot"></span>
       <span id="provider-name">Loading...</span>
-      <a id="change-provider" href="#" class="pill-link">Change</a>
+      <a id="change-provider" href="#" class="pill-link">Configure</a>
     </div>
 
-    <!-- Stats -->
+    <!-- Telemetry Stats -->
     <div class="stats">
-      <div class="stat"><div class="stat-v" id="st-total">—</div><div class="stat-l">Total</div></div>
-      <div class="stat"><div class="stat-v" id="st-week">—</div><div class="stat-l">This Week</div></div>
-      <div class="stat"><div class="stat-v" id="st-inter">—</div><div class="stat-l">Interviews</div></div>
+      <div class="stat">
+        <div class="stat-v" id="st-total">—</div>
+        <div class="stat-l">Total</div>
+      </div>
+      <div class="stat">
+        <div class="stat-v" id="st-week">—</div>
+        <div class="stat-l">This Week</div>
+      </div>
+      <div class="stat">
+        <div class="stat-v" id="st-inter">—</div>
+        <div class="stat-l">Interviews</div>
+      </div>
     </div>
 
-    <!-- Recent -->
+    <!-- Recent Section -->
     <div class="sec-hd">
-      <span>Recent</span>
-      <a href="https://applli-sync.vercel.app/dashboard" target="_blank" class="link-sm">All →</a>
+      <span>Recent Tracks</span>
+      <a href="https://applli-sync.vercel.app/dashboard" target="_blank" class="link-sm">All Jobs →</a>
     </div>
-    <div id="p-apps" class="apps-list"><div class="loading">Loading…</div></div>
+    <div id="p-apps" class="apps-list">
+      <div class="loading">
+        <svg class="spinner" viewBox="0 0 50 50">
+          <circle class="path" cx="25" cy="25" r="20" fill="none" stroke-width="5"></circle>
+        </svg>
+        <span>Loading applications…</span>
+      </div>
+    </div>
   </div>
 
 </div>
