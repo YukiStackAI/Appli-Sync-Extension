@@ -75,7 +75,53 @@
       }
     }
 
-    // Fallback: Send the complete clean raw HTML
+    // 4. Advanced Deep-Serializer fallback for all Custom Company Careers Portals (Phenom, Workday, Lever, Greenhouse, etc.)
+    // Recursively flattens and includes open Shadow DOM content so web components are fully visible to backend Scrapling.
+    function deepSerialize(node) {
+      if (node.nodeType === Node.TEXT_NODE) {
+        return node.nodeValue.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      }
+      if (node.nodeType !== Node.ELEMENT_NODE) {
+        return '';
+      }
+      const tag = node.tagName.toLowerCase();
+      if (['script', 'style', 'nav', 'footer', 'header', 'aside', 'noscript', 'iframe'].includes(tag)) {
+        return '';
+      }
+      let html = `<${tag}`;
+      
+      // Serialize attributes securely
+      if (node.attributes) {
+        for (const attr of node.attributes) {
+          if (attr.value && attr.value.length < 500) {
+            html += ` ${attr.name}="${attr.value.replace(/"/g, '&quot;')}"`;
+          }
+        }
+      }
+      html += '>';
+      
+      // Expand and serialize Shadow DOM if present
+      if (node.shadowRoot) {
+        html += Array.from(node.shadowRoot.childNodes).map(deepSerialize).join('');
+      }
+      
+      // Serialize light DOM children
+      html += Array.from(node.childNodes).map(deepSerialize).join('');
+      
+      html += `</${tag}>`;
+      return html;
+    }
+
+    try {
+      const serialized = deepSerialize(document.body);
+      if (serialized && serialized.trim().length > 200) {
+        return serialized;
+      }
+    } catch (e) {
+      console.warn('[AppliSync] Shadow DOM serialization failed, falling back...', e);
+    }
+
+    // Ultimate Fallback: Send standard HTML
     return document.documentElement.outerHTML || document.body.innerHTML;
   }
 
