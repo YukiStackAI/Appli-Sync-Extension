@@ -91,6 +91,9 @@ async function extractWithAI(html, url) {
   } else if (provider === 'openrouter') {
     apiKey = settings.openrouter_key  || '';
     model  = settings.openrouter_model || '';
+  } else if (provider === 'nvidia') {
+    apiKey = settings.nvidia_key  || '';
+    model  = settings.nvidia_model || 'meta/llama-3.3-70b-instruct';
   } else if (provider === 'ollama') {
     model  = settings.ollama_model  || '';
   }

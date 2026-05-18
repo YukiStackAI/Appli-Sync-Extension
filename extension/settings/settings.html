@@ -226,6 +226,37 @@
           </div>
         </label>
 
+        <!-- NVIDIA NIM -->
+        <label class="provider-card" data-provider="nvidia">
+          <input type="radio" name="provider" value="nvidia"/>
+          <div class="pc-inner">
+            <div class="pc-top">
+              <div class="pc-icon nvidia-icon">N</div>
+              <div class="pc-info">
+                <div class="pc-name">NVIDIA NIM <span class="badge free">Developer Hub</span></div>
+                <div class="pc-sub">High-performance AI inference microservices with zero-latency</div>
+              </div>
+              <div class="pc-check">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              </div>
+            </div>
+            <div class="pc-fields">
+              <div class="mini-field">
+                <label>NVIDIA NIM API Key</label>
+                <input type="password" id="nvidia-key" placeholder="nvapi-…" autocomplete="off"/>
+              </div>
+              <div class="mini-field">
+                <label>Model Configuration</label>
+                <select id="nvidia-model">
+                  <option value="meta/llama-3.3-70b-instruct">meta/llama-3.3-70b-instruct (highly recommended)</option>
+                  <option value="nvidia/llama-3.1-nemotron-70b-instruct">nvidia/llama-3.1-nemotron-70b-instruct (extreme reasoning)</option>
+                  <option value="meta/llama-3.1-70b-instruct">meta/llama-3.1-70b-instruct</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </label>
+
         <!-- Anthropic Claude -->
         <label class="provider-card" data-provider="anthropic">
           <input type="radio" name="provider" value="anthropic"/>

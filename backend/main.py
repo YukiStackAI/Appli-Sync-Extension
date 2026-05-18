@@ -205,6 +205,27 @@ async def call_openrouter(prompt: str, api_key: str, model: Optional[str]) -> st
         res.raise_for_status()
         return res.json()["choices"][0]["message"]["content"]
 
+async def call_nvidia(prompt: str, api_key: str, model: Optional[str]) -> str:
+    async with httpx.AsyncClient(timeout=30) as client:
+        res = await client.post(
+            "https://integrate.api.nvidia.com/v1/chat/completions",
+            headers={
+                "Authorization": f"Bearer {api_key}",
+                "Content-Type":  "application/json"
+            },
+            json={
+                "model":    model or "meta/llama-3.3-70b-instruct",
+                "messages": [
+                    {"role": "system", "content": SYSTEM_PROMPT},
+                    {"role": "user",   "content": prompt}
+                ],
+                "max_tokens":  1500,
+                "temperature": 0.1,
+            }
+        )
+        res.raise_for_status()
+        return res.json()["choices"][0]["message"]["content"]
+
 # ── Parse LLM Response ────────────────────────────────────────
 def parse_llm_response(raw: str) -> dict:
     # Strip markdown code fences if present
@@ -272,6 +293,11 @@ async def extract(req: ExtractRequest):
             if not req.api_key:
                 raise HTTPException(400, "OpenRouter API key required")
             raw = await call_openrouter(prompt, req.api_key, req.model)
+
+        elif provider == "nvidia":
+            if not req.api_key:
+                raise HTTPException(400, "NVIDIA NIM API key required")
+            raw = await call_nvidia(prompt, req.api_key, req.model)
 
         else:
             raise HTTPException(400, f"Unknown provider: {provider}")

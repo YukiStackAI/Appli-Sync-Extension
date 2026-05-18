@@ -339,6 +339,12 @@ nav {
   font-size: 14px;
 }
 
+.nvidia-icon {
+  background: rgba(118, 185, 0, 0.1);
+  color: #76b900;
+  border-color: rgba(118, 185, 0, 0.15);
+}
+
 .anthropic-icon {
   background: rgba(249, 115, 22, 0.08);
   color: #fca5a5;

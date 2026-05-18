@@ -44,6 +44,8 @@ async function loadSettings() {
   setValue('openai-model',      s.openai_model      || 'gpt-4o-mini');
   setValue('gemini-key',        s.gemini_key        || '');
   setValue('gemini-model',      s.gemini_model      || 'gemini-1.5-flash');
+  setValue('nvidia-key',        s.nvidia_key        || '');
+  setValue('nvidia-model',      s.nvidia_model      || 'meta/llama-3.3-70b-instruct');
   setValue('anthropic-key',     s.anthropic_key     || '');
   setValue('anthropic-model',   s.anthropic_model   || 'claude-haiku-4-5-20251001');
   setValue('openrouter-key',    s.openrouter_key    || '');
@@ -77,6 +79,8 @@ document.getElementById('save-btn')?.addEventListener('click', async () => {
     openai_model:     getValue('openai-model'),
     gemini_key:       getValue('gemini-key'),
     gemini_model:     getValue('gemini-model'),
+    nvidia_key:       getValue('nvidia-key'),
+    nvidia_model:     getValue('nvidia-model'),
     anthropic_key:    getValue('anthropic-key'),
     anthropic_model:  getValue('anthropic-model'),
     openrouter_key:   getValue('openrouter-key'),

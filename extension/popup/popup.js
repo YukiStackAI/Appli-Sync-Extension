@@ -60,6 +60,7 @@ async function loadProviderPill() {
     gemini:       'Gemini · ' + (s.model || 'gemini-1.5-flash'),
     anthropic:    'Claude · ' + (s.model || 'claude-haiku'),
     openrouter:   'OpenRouter · ' + (s.model || 'mixtral'),
+    nvidia:       'NVIDIA NIM · ' + (s.model ? s.model.split('/').pop() : 'llama-3.3-70b'),
   };
   $('provider-name').textContent = map[s.provider || 'groq_default'] || 'Groq (Default)';
 }
