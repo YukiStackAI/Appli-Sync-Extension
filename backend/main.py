@@ -305,9 +305,15 @@ async def extract(req: ExtractRequest):
     except HTTPException:
         raise
     except httpx.HTTPStatusError as e:
-        raise HTTPException(502, f"LLM API error ({provider}): {e.response.status_code} — {e.response.text[:200]}")
+        error_detail = f"LLM API error ({provider}): Status {e.response.status_code} — {e.response.text[:300]}"
+        print(f"HTTPStatusError: {error_detail}")
+        raise HTTPException(502, error_detail)
     except Exception as e:
-        raise HTTPException(502, f"LLM call failed: {str(e)}")
+        import traceback
+        error_detail = f"{type(e).__name__}: {str(e)}"
+        print(f"LLM call failed with error: {error_detail}")
+        traceback.print_exc()
+        raise HTTPException(502, f"LLM call failed: {error_detail}")
 
     # 4. Parse + return
     data = parse_llm_response(raw)
