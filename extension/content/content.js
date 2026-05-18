@@ -36,7 +36,46 @@
   }
 
   function getPageHTML() {
-    // Send the complete raw HTML of the page so that Scrapling on the backend can clean and parse it perfectly!
+    const host = location.hostname.toLowerCase();
+    
+    // 1. LinkedIn (Target the active right-hand job details panel or single-view content)
+    if (host.includes('linkedin.com')) {
+      const target = 
+        document.querySelector('.jobs-search__job-details--container') || 
+        document.querySelector('.jobs-description') ||
+        document.querySelector('.jobs-description__container') ||
+        document.querySelector('main.scaffold-layout__main') ||
+        document.querySelector('#main-content') ||
+        document.querySelector('#main');
+      if (target) {
+        return target.outerHTML;
+      }
+    }
+    
+    // 2. Naukri (Target the left main job description and specs block)
+    if (host.includes('naukri.com')) {
+      const target = 
+        document.querySelector('.jd-container') || 
+        document.querySelector('.job-desc') ||
+        document.querySelector('.left-sec') ||
+        document.querySelector('#main-container');
+      if (target) {
+        return target.outerHTML;
+      }
+    }
+    
+    // 3. Indeed (Target the main job details component or container)
+    if (host.includes('indeed.com')) {
+      const target = 
+        document.querySelector('.jobsearch-JobComponent') || 
+        document.querySelector('#jobDescriptionText') ||
+        document.querySelector('#viewJobButtonLinkContainer');
+      if (target) {
+        return target.outerHTML;
+      }
+    }
+
+    // Fallback: Send the complete clean raw HTML
     return document.documentElement.outerHTML || document.body.innerHTML;
   }
 
