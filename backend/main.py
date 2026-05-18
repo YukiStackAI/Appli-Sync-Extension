@@ -317,6 +317,7 @@ async def extract(req: ExtractRequest):
 
     # 4. Parse + return
     data = parse_llm_response(raw)
+    data["scraped_text"] = page_text
     return data
 
 @app.get("/health")

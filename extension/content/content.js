@@ -300,6 +300,12 @@
               <div id="as-jd-preview"></div>
             </details>
 
+            <!-- Raw Scraped Content Toggle -->
+            <details class="as-jd-toggle" style="margin-top: 8px;">
+              <summary>Raw Scraped Page Text <span id="as-scraped-chars"></span></summary>
+              <textarea id="as-scraped-preview" readonly style="width: 100%; height: 120px; background: rgba(0, 0, 0, 0.25); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 6px; color: rgba(255, 255, 255, 0.7); font-family: monospace; font-size: 11px; padding: 8px; resize: vertical; margin-top: 6px; box-sizing: border-box; outline: none;"></textarea>
+            </details>
+
             <!-- Captured indicators -->
             <div id="as-captures">
               <div id="as-form-badge" class="as-badge" style="display:none">
@@ -466,6 +472,13 @@
       if (d.job_description) {
         document.getElementById('as-jd-preview').textContent = d.job_description.slice(0, 600) + '...';
         document.getElementById('as-jd-chars').textContent   = `(${d.job_description.length} chars)`;
+      }
+
+      if (d.scraped_text) {
+        const scrPreview = document.getElementById('as-scraped-preview');
+        const scrChars = document.getElementById('as-scraped-chars');
+        if (scrPreview) scrPreview.value = d.scraped_text;
+        if (scrChars) scrChars.textContent = `(${d.scraped_text.length} chars)`;
       }
 
       fields.style.display = 'block';
