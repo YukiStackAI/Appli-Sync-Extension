@@ -91,19 +91,21 @@
 
       html += '>';
 
-      // Expose the live typed value as text content so the backend scraper catches it
-      // Scrapling (and most text extractors) ignore value="" attributes and only read text nodes.
-      if ((tag === 'input' || tag === 'select') && node.type !== 'file' && node.type !== 'hidden' && node.value) {
-        html += ` [${node.value.replace(/</g, '&lt;').replace(/>/g, '&gt;')}] `;
-      }
+      // ── AGGRESSIVE VALUE EXTRACTION ──
+      // Some portals (like MS Forms) use custom elements or heavily obfuscated inputs.
+      // Instead of checking for tag === 'input', we check if ANY node has a string .value property
+      // or is contenteditable, and forcefully inject that value as visible text.
+      try {
+        if (typeof node.value === 'string' && node.value.trim() !== '' && node.type !== 'hidden' && node.type !== 'password') {
+          html += ` [USER INPUT: ${node.value.replace(/</g, '&lt;').replace(/>/g, '&gt;')}] `;
+        } else if (node.isContentEditable) {
+          const textVal = node.innerText || node.textContent;
+          if (textVal && textVal.trim() !== '') {
+            html += ` [USER INPUT: ${textVal.replace(/</g, '&lt;').replace(/>/g, '&gt;')}] `;
+          }
+        }
+      } catch (_) {}
 
-      // For textarea, inject the live value as text content
-      if (tag === 'textarea' && node.value) {
-        html += node.value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-        html += `</${tag}>`;
-        return html;
-      }
-      
       // Expand Shadow DOM
       if (node.shadowRoot) {
         syncFormValues(node.shadowRoot);
