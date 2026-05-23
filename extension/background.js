@@ -119,22 +119,23 @@ async function saveApplication(data) {
   if (!session) throw new Error('Not signed in');
 
   const rawDate = data.posting_date;
-  const isInvalidDate = !rawDate || rawDate.trim() === '' || rawDate.trim().toUpperCase() === 'NA' || rawDate.trim() === '—';
+  const rawDateStr = rawDate ? String(rawDate).trim() : '';
+  const isInvalidDate = !rawDateStr || rawDateStr.toUpperCase() === 'NA' || rawDateStr === '—';
 
   const record = {
     user_id:             session.user.id,
     portal:              data.portal              || 'Company Website',
     company:             data.company             || 'Unknown',
     role:                data.role                || 'Unknown',
-    posting_date:        isInvalidDate            ? null : rawDate.trim(),
+    posting_date:        isInvalidDate            ? null : rawDateStr,
     job_description:     data.job_description     || null,
     experience_required: data.experience_required || 'Fresher',
     applied_date:        new Date().toISOString(),
     location:            data.location            || null,
     salary:              data.salary              || null,
     job_url:             data.job_url             || null,
-    form_fields:         data.form_fields         ? JSON.stringify(data.form_fields) : null,
-    files_submitted:     data.files_submitted     ? JSON.stringify(data.files_submitted) : null,
+    form_fields:         data.form_fields         || null,
+    files_submitted:     data.files_submitted     || null,
     mode_of_work:          data.mode_of_work          || null,
     skills_required:       data.skills_required       || null,
     important_information: data.important_information || null,
@@ -190,6 +191,21 @@ chrome.runtime.onMessage.addListener((msg, sender, reply) => {
         case 'EXTRACT_PAGE': {
           const result = await extractWithAI(msg.html, msg.url);
           return { ok: true, data: result };
+        }
+
+        case 'SCRAPE_PAGE': {
+          const settings = await getSettings();
+          const backendUrl = settings.backend_url || BACKEND_URL;
+          const res = await fetch(`${backendUrl}/scrape`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ html: msg.html, url: msg.url })
+          });
+          if (!res.ok) {
+            const err = await res.text();
+            throw new Error(`Scrape error: ${err}`);
+          }
+          return { ok: true, data: await res.json() };
         }
 
         case 'SAVE_APPLICATION': {

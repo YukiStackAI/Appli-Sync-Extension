@@ -239,6 +239,20 @@
             <span id="as-url-short">${location.hostname}</span>
           </div>
 
+          <!-- Test Scrape Button -->
+          <button id="as-scrape" class="as-btn as-btn-scrape">
+            <span id="as-scrape-icon">🔍</span>
+            <span id="as-scrape-text">Test Scrape · Raw Text Only</span>
+          </button>
+
+          <!-- Raw Scrape Results Panel -->
+          <div id="as-scrape-results" style="display:none">
+            <div id="as-scrape-meta" class="as-scrape-meta"></div>
+            <textarea id="as-scrape-output" readonly placeholder="Raw scraped text will appear here..."></textarea>
+          </div>
+
+          <div class="as-divider"></div>
+
           <!-- Extract Button -->
           <button id="as-extract" class="as-btn as-btn-primary">
             <span id="as-extract-icon">⚡</span>
@@ -394,6 +408,9 @@
     // Extract
     overlay.querySelector('#as-extract').addEventListener('click', handleExtract);
 
+    // Scrape Only
+    overlay.querySelector('#as-scrape').addEventListener('click', handleScrape);
+
     // Save
     overlay.querySelector('#as-save').addEventListener('click', handleSave);
   }
@@ -431,6 +448,57 @@
   function showMain() {
     document.getElementById('as-auth-gate').style.display = 'none';
     document.getElementById('as-main').style.display      = 'block';
+  }
+
+  // ─── Scrape Only (No LLM) ─────────────────────────────────────
+  async function handleScrape() {
+    const btn     = document.getElementById('as-scrape');
+    const icon    = document.getElementById('as-scrape-icon');
+    const txtEl   = document.getElementById('as-scrape-text');
+    const results = document.getElementById('as-scrape-results');
+    const metaEl  = document.getElementById('as-scrape-meta');
+    const output  = document.getElementById('as-scrape-output');
+    const statusEl = document.getElementById('as-status');
+
+    icon.textContent     = '⏳';
+    txtEl.textContent    = 'Scraping page...';
+    btn.disabled         = true;
+    statusEl.textContent = '';
+
+    try {
+      const html = getPageHTML();
+      const htmlSize = new Blob([html]).size;
+      const res  = await msg('SCRAPE_PAGE', { html, url: location.href });
+
+      if (!res?.ok) throw new Error(res?.error || 'Scrape failed');
+
+      const d = res.data;
+
+      // Show metadata
+      metaEl.innerHTML = `
+        <div class="as-meta-row"><span class="as-meta-label">Portal</span><span class="as-meta-value">${d.portal}</span></div>
+        <div class="as-meta-row"><span class="as-meta-label">URL</span><span class="as-meta-value as-meta-url">${location.hostname}${location.pathname.slice(0, 40)}</span></div>
+        <div class="as-meta-row"><span class="as-meta-label">HTML Sent</span><span class="as-meta-value">${(htmlSize / 1024).toFixed(1)} KB</span></div>
+        <div class="as-meta-row"><span class="as-meta-label">Text Extracted</span><span class="as-meta-value as-meta-highlight">${d.char_count.toLocaleString()} chars</span></div>
+      `;
+
+      // Show raw text
+      output.value = d.scraped_text || '(empty — no text extracted)';
+      results.style.display = 'block';
+
+      if (d.char_count > 200) {
+        showOverlayStatus(`✅ Scraped ${d.char_count.toLocaleString()} chars from ${d.portal}`, 'success');
+      } else {
+        showOverlayStatus(`⚠️ Only ${d.char_count} chars extracted — page may need different selectors`, 'info');
+      }
+
+    } catch (e) {
+      showOverlayStatus('❌ ' + e.message, 'error');
+    } finally {
+      icon.textContent  = '🔍';
+      txtEl.textContent = 'Re-Scrape · Raw Text Only';
+      btn.disabled      = false;
+    }
   }
 
   // ─── Extract ─────────────────────────────────────────────────
@@ -635,8 +703,18 @@
   chrome.runtime.onMessage.addListener((message) => {
     if (message.type === 'SHOW_OVERLAY') {
       const overlay = document.getElementById('as-overlay');
-      if (overlay) overlay.style.display = 'block';
-      else buildOverlay();
+      if (overlay) {
+        overlay.style.display = 'block';
+        // Restore body and header buttons visibility
+        const body = overlay.querySelector('#as-body');
+        const pill = overlay.querySelector('#as-pill');
+        const headerBtns = overlay.querySelector('#as-header-btns');
+        if (body) body.style.display = 'block';
+        if (pill) pill.style.display = 'none';
+        if (headerBtns) headerBtns.style.display = 'flex';
+      } else {
+        buildOverlay();
+      }
     }
   });
 

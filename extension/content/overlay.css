@@ -387,3 +387,99 @@
 
 /* ── Fields block ── */
 #as-fields { display: flex; flex-direction: column !important; gap: 8px !important; }
+
+/* ── Test Scrape Button ── */
+.as-btn-scrape {
+  background: rgba(6, 182, 212, 0.1) !important;
+  border: 1px solid rgba(6, 182, 212, 0.25) !important;
+  color: #22d3ee !important;
+}
+
+.as-btn-scrape:hover:not(:disabled) {
+  background: rgba(6, 182, 212, 0.18) !important;
+  border-color: rgba(6, 182, 212, 0.4) !important;
+  transform: translateY(-1px) !important;
+}
+
+/* ── Divider ── */
+.as-divider {
+  height: 1px !important;
+  background: rgba(255, 255, 255, 0.06) !important;
+  margin: 4px 0 !important;
+}
+
+/* ── Scrape Results Panel ── */
+#as-scrape-results {
+  display: flex;
+  flex-direction: column !important;
+  gap: 8px !important;
+  animation: as-slidein 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+#as-scrape-output {
+  width: 100% !important;
+  height: 180px !important;
+  background: rgba(0, 0, 0, 0.3) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 8px !important;
+  color: rgba(255, 255, 255, 0.8) !important;
+  font-family: 'JetBrains Mono', monospace !important;
+  font-size: 11px !important;
+  line-height: 1.6 !important;
+  padding: 10px !important;
+  resize: vertical !important;
+  box-sizing: border-box !important;
+  outline: none !important;
+  white-space: pre-wrap !important;
+  word-break: break-word !important;
+}
+
+#as-scrape-output:focus {
+  border-color: rgba(6, 182, 212, 0.3) !important;
+  box-shadow: 0 0 0 2px rgba(6, 182, 212, 0.08) !important;
+}
+
+/* ── Scrape Metadata ── */
+.as-scrape-meta {
+  background: rgba(6, 182, 212, 0.05) !important;
+  border: 1px solid rgba(6, 182, 212, 0.12) !important;
+  border-radius: 8px !important;
+  padding: 8px 10px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 4px !important;
+}
+
+.as-meta-row {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  font-size: 11px !important;
+}
+
+.as-meta-label {
+  color: #64748b !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  font-size: 9.5px !important;
+  letter-spacing: 0.5px !important;
+}
+
+.as-meta-value {
+  color: #94a3b8 !important;
+  font-weight: 600 !important;
+  font-family: 'JetBrains Mono', monospace !important;
+  font-size: 11px !important;
+}
+
+.as-meta-url {
+  max-width: 180px !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+.as-meta-highlight {
+  color: #22d3ee !important;
+  font-weight: 800 !important;
+}

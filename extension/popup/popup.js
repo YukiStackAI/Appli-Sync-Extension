@@ -54,13 +54,13 @@ async function loadProviderPill() {
   const s   = res?.data || {};
   const map  = {
     groq_default: 'Groq (Default · Free)',
-    groq:         'Groq · ' + (s.model || 'llama-3.3-70b'),
+    groq:         'Groq · ' + (s.groq_model || 'llama-3.3-70b'),
     ollama:       'Ollama · Local',
-    openai:       'OpenAI · ' + (s.model || 'gpt-4o-mini'),
-    gemini:       'Gemini · ' + (s.model || 'gemini-1.5-flash'),
-    anthropic:    'Claude · ' + (s.model || 'claude-haiku'),
-    openrouter:   'OpenRouter · ' + (s.model || 'mixtral'),
-    nvidia:       'NVIDIA NIM · ' + (s.model ? s.model.split('/').pop() : 'llama-3.3-70b'),
+    openai:       'OpenAI · ' + (s.openai_model || 'gpt-4o-mini'),
+    gemini:       'Gemini · ' + (s.gemini_model || 'gemini-1.5-flash'),
+    anthropic:    'Claude · ' + (s.anthropic_model || 'claude-haiku'),
+    openrouter:   'OpenRouter · ' + (s.openrouter_model || 'mixtral'),
+    nvidia:       'NVIDIA NIM · ' + (s.nvidia_model ? s.nvidia_model.split('/').pop() : 'llama-3.3-70b'),
   };
   $('provider-name').textContent = map[s.provider || 'groq_default'] || 'Groq (Default)';
 }

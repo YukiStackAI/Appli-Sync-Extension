@@ -9,7 +9,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Optional
 import json, re, os, httpx
-from datetime import datetime
+from datetime import datetime, timezone
 from dotenv import load_dotenv
 
 # Load local environment variables from .env
@@ -320,6 +320,42 @@ async def extract(req: ExtractRequest):
     data["scraped_text"] = page_text
     return data
 
+# ── Scrape-Only Endpoint (no LLM) ─────────────────────────────
+class ScrapeRequest(BaseModel):
+    html: str
+    url:  str
+
+@app.post("/scrape")
+async def scrape_only(req: ScrapeRequest):
+    """Extract clean text from raw HTML using Scrapling — no LLM involved."""
+    try:
+        page_text = scrape_page(req.html)
+        # Detect portal from URL
+        host = req.url.lower()
+        portal = "Company Website"
+        portal_map = {
+            "linkedin.com": "LinkedIn", "naukri.com": "Naukri",
+            "indeed.com": "Indeed", "internshala.com": "Internshala",
+            "glassdoor.com": "Glassdoor", "wellfound.com": "Wellfound",
+            "lever.co": "Lever", "greenhouse.io": "Greenhouse",
+            "workday.com": "Workday", "smartrecruiters.com": "SmartRecruiters",
+        }
+        for domain, name in portal_map.items():
+            if domain in host:
+                portal = name
+                break
+
+        return {
+            "scraped_text": page_text,
+            "char_count":   len(page_text),
+            "portal":       portal,
+            "url":          req.url,
+        }
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(500, f"Scrape failed: {type(e).__name__}: {str(e)}")
+
 @app.get("/health")
 def health():
-    return {"status": "ok", "version": "2.0.0", "time": datetime.utcnow().isoformat()}
+    return {"status": "ok", "version": "2.0.0", "time": datetime.now(timezone.utc).isoformat()}
