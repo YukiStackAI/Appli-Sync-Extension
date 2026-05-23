@@ -37,8 +37,38 @@
 
   function getPageHTML() {
     const host = location.hostname.toLowerCase();
-    
-    // 1. LinkedIn (Target the active right-hand job details panel or single-view content)
+
+    // ── Sync live form values into HTML attributes before any serialization ──
+    // Typed text lives in .value (JS property) but outerHTML only reads
+    // the value="" attribute — which stays empty. This bridges the gap.
+    function syncFormValues(root) {
+      if (!root) return;
+      root.querySelectorAll('input, textarea, select').forEach(el => {
+        try {
+          if (el.tagName === 'TEXTAREA') {
+            // For textareas, the text content IS the serialized value
+            el.textContent = el.value;
+          } else if (el.tagName === 'SELECT') {
+            Array.from(el.options).forEach(opt => {
+              if (opt.selected) opt.setAttribute('selected', 'selected');
+              else opt.removeAttribute('selected');
+            });
+          } else if (el.tagName === 'INPUT') {
+            if (el.type === 'checkbox' || el.type === 'radio') {
+              if (el.checked) el.setAttribute('checked', 'checked');
+              else el.removeAttribute('checked');
+            } else if (el.type !== 'file') {
+              el.setAttribute('value', el.value);
+            }
+          }
+        } catch (_) { /* skip protected elements */ }
+      });
+    }
+
+    // Sync the entire document first
+    syncFormValues(document);
+
+    // 1. LinkedIn
     if (host.includes('linkedin.com')) {
       const target = 
         document.querySelector('.jobs-search__job-details--container') || 
@@ -52,7 +82,7 @@
       }
     }
     
-    // 2. Naukri (Target the left main job description and specs block)
+    // 2. Naukri
     if (host.includes('naukri.com')) {
       const target = 
         document.querySelector('.jd-container') || 
@@ -64,7 +94,7 @@
       }
     }
     
-    // 3. Indeed (Target the main job details component or container)
+    // 3. Indeed
     if (host.includes('indeed.com')) {
       const target = 
         document.querySelector('.jobsearch-JobComponent') || 
@@ -75,8 +105,7 @@
       }
     }
 
-    // 4. Advanced Deep-Serializer fallback for all Custom Company Careers Portals (Phenom, Workday, Lever, Greenhouse, etc.)
-    // Recursively flattens and includes open Shadow DOM content so web components are fully visible to backend Scrapling.
+    // 4. Deep-Serializer for custom portals (Phenom, Workday, Lever, Greenhouse, Google Forms, etc.)
     function deepSerialize(node) {
       if (node.nodeType === Node.TEXT_NODE) {
         return node.nodeValue.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -88,9 +117,10 @@
       if (['script', 'style', 'nav', 'footer', 'header', 'aside', 'noscript', 'iframe'].includes(tag)) {
         return '';
       }
+
       let html = `<${tag}`;
       
-      // Serialize attributes securely
+      // Serialize attributes
       if (node.attributes) {
         for (const attr of node.attributes) {
           if (attr.value && attr.value.length < 500) {
@@ -98,14 +128,30 @@
           }
         }
       }
+
+      // For input elements, inject the live .value if not already in attributes
+      if (tag === 'input' && node.type !== 'file' && node.value) {
+        if (!node.getAttribute('value')) {
+          html += ` value="${node.value.replace(/"/g, '&quot;')}"`;
+        }
+      }
+
       html += '>';
+
+      // For textarea, inject the live value as text content
+      if (tag === 'textarea' && node.value) {
+        html += node.value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        html += `</${tag}>`;
+        return html;
+      }
       
-      // Expand and serialize Shadow DOM if present
+      // Expand Shadow DOM
       if (node.shadowRoot) {
+        syncFormValues(node.shadowRoot);
         html += Array.from(node.shadowRoot.childNodes).map(deepSerialize).join('');
       }
       
-      // Serialize light DOM children
+      // Light DOM children
       html += Array.from(node.childNodes).map(deepSerialize).join('');
       
       html += `</${tag}>`;
@@ -121,7 +167,7 @@
       console.warn('[AppliSync] Shadow DOM serialization failed, falling back...', e);
     }
 
-    // Ultimate Fallback: Send standard HTML
+    // Ultimate Fallback
     return document.documentElement.outerHTML || document.body.innerHTML;
   }
 
