@@ -65,47 +65,7 @@
       });
     }
 
-    // Sync the entire document first
-    syncFormValues(document);
-
-    // 1. LinkedIn
-    if (host.includes('linkedin.com')) {
-      const target = 
-        document.querySelector('.jobs-search__job-details--container') || 
-        document.querySelector('.jobs-description') ||
-        document.querySelector('.jobs-description__container') ||
-        document.querySelector('main.scaffold-layout__main') ||
-        document.querySelector('#main-content') ||
-        document.querySelector('#main');
-      if (target) {
-        return target.outerHTML;
-      }
-    }
-    
-    // 2. Naukri
-    if (host.includes('naukri.com')) {
-      const target = 
-        document.querySelector('.jd-container') || 
-        document.querySelector('.job-desc') ||
-        document.querySelector('.left-sec') ||
-        document.querySelector('#main-container');
-      if (target) {
-        return target.outerHTML;
-      }
-    }
-    
-    // 3. Indeed
-    if (host.includes('indeed.com')) {
-      const target = 
-        document.querySelector('.jobsearch-JobComponent') || 
-        document.querySelector('#jobDescriptionText') ||
-        document.querySelector('#viewJobButtonLinkContainer');
-      if (target) {
-        return target.outerHTML;
-      }
-    }
-
-    // 4. Deep-Serializer for custom portals (Phenom, Workday, Lever, Greenhouse, Google Forms, etc.)
+    // Deep-Serializer recursively flattens Shadow DOM and injects live input values as text
     function deepSerialize(node) {
       if (node.nodeType === Node.TEXT_NODE) {
         return node.nodeValue.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -129,14 +89,13 @@
         }
       }
 
-      // For input elements, inject the live .value if not already in attributes
-      if (tag === 'input' && node.type !== 'file' && node.value) {
-        if (!node.getAttribute('value')) {
-          html += ` value="${node.value.replace(/"/g, '&quot;')}"`;
-        }
-      }
-
       html += '>';
+
+      // Expose the live typed value as text content so the backend scraper catches it
+      // Scrapling (and most text extractors) ignore value="" attributes and only read text nodes.
+      if ((tag === 'input' || tag === 'select') && node.type !== 'file' && node.type !== 'hidden' && node.value) {
+        html += ` [${node.value.replace(/</g, '&lt;').replace(/>/g, '&gt;')}] `;
+      }
 
       // For textarea, inject the live value as text content
       if (tag === 'textarea' && node.value) {
@@ -158,6 +117,47 @@
       return html;
     }
 
+    // Sync the entire document first
+    syncFormValues(document);
+
+    // 1. LinkedIn
+    if (host.includes('linkedin.com')) {
+      const target = 
+        document.querySelector('.jobs-search__job-details--container') || 
+        document.querySelector('.jobs-description') ||
+        document.querySelector('.jobs-description__container') ||
+        document.querySelector('main.scaffold-layout__main') ||
+        document.querySelector('#main-content') ||
+        document.querySelector('#main');
+      if (target) {
+        return deepSerialize(target);
+      }
+    }
+    
+    // 2. Naukri
+    if (host.includes('naukri.com')) {
+      const target = 
+        document.querySelector('.jd-container') || 
+        document.querySelector('.job-desc') ||
+        document.querySelector('.left-sec') ||
+        document.querySelector('#main-container');
+      if (target) {
+        return deepSerialize(target);
+      }
+    }
+    
+    // 3. Indeed
+    if (host.includes('indeed.com')) {
+      const target = 
+        document.querySelector('.jobsearch-JobComponent') || 
+        document.querySelector('#jobDescriptionText') ||
+        document.querySelector('#viewJobButtonLinkContainer');
+      if (target) {
+        return deepSerialize(target);
+      }
+    }
+
+    // 4. Fallback for custom portals (Phenom, Workday, Lever, Greenhouse, Google Forms, etc.)
     try {
       const serialized = deepSerialize(document.body);
       if (serialized && serialized.trim().length > 200) {
