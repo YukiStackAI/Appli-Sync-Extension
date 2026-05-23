@@ -122,51 +122,14 @@
     // Sync the entire document first
     syncFormValues(document);
 
-    // 1. LinkedIn
-    if (host.includes('linkedin.com')) {
-      const target = 
-        document.querySelector('.jobs-search__job-details--container') || 
-        document.querySelector('.jobs-description') ||
-        document.querySelector('.jobs-description__container') ||
-        document.querySelector('main.scaffold-layout__main') ||
-        document.querySelector('#main-content') ||
-        document.querySelector('#main');
-      if (target) {
-        return deepSerialize(target);
-      }
-    }
-    
-    // 2. Naukri
-    if (host.includes('naukri.com')) {
-      const target = 
-        document.querySelector('.jd-container') || 
-        document.querySelector('.job-desc') ||
-        document.querySelector('.left-sec') ||
-        document.querySelector('#main-container');
-      if (target) {
-        return deepSerialize(target);
-      }
-    }
-    
-    // 3. Indeed
-    if (host.includes('indeed.com')) {
-      const target = 
-        document.querySelector('.jobsearch-JobComponent') || 
-        document.querySelector('#jobDescriptionText') ||
-        document.querySelector('#viewJobButtonLinkContainer');
-      if (target) {
-        return deepSerialize(target);
-      }
-    }
-
-    // 4. Fallback for custom portals (Phenom, Workday, Lever, Greenhouse, Google Forms, etc.)
+    // Capture the entire page using deepSerialize for maximum compatibility on company pages
     try {
       const serialized = deepSerialize(document.body);
       if (serialized && serialized.trim().length > 200) {
         return serialized;
       }
     } catch (e) {
-      console.warn('[AppliSync] Shadow DOM serialization failed, falling back...', e);
+      console.warn('[AppliSync] Serialization failed, falling back...', e);
     }
 
     // Ultimate Fallback

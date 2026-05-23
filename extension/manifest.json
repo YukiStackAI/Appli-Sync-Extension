@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "AppliSync — AI Job Tracker",
   "version": "2.0.0",
-  "description": "AI-powered job application tracker. Auto-captures from LinkedIn, Naukri, Indeed & company sites. Supports Groq, Ollama, OpenAI, Gemini & Claude.",
+  "description": "AI-powered job application tracker. Auto-captures forms and job details from any company career page. Supports Groq, Ollama, OpenAI, Gemini & Claude.",
 
   "icons": {
     "16":  "icons/icon16.png",
@@ -24,17 +24,6 @@
   "content_scripts": [
     {
       "matches": [
-        "*://*.linkedin.com/*",
-        "*://*.naukri.com/*",
-        "*://*.indeed.com/*",
-        "*://*.internshala.com/*",
-        "*://*.glassdoor.com/*",
-        "*://*.wellfound.com/*",
-        "*://*.lever.co/*",
-        "*://*.greenhouse.io/*",
-        "*://*.myworkdayjobs.com/*",
-        "*://*.smartrecruiters.com/*",
-        "*://*.jobs.ashbyhq.com/*",
         "*://*/*"
       ],
       "js":  ["content/content.js"],
