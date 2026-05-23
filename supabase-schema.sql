@@ -25,16 +25,11 @@ CREATE TABLE IF NOT EXISTS applications (
   status               TEXT DEFAULT 'Applied'
     CHECK (status IN ('Applied','Screening','Interview','Technical','Offered','Rejected','Withdrawn','Ghosted')),
 
-  -- Form data captured by extension
-  form_fields          JSONB,        -- { "Phone": "9876543210", "Cover Letter": "..." }
-  files_submitted      JSONB,        -- ["Rahul_Resume_2025.pdf", "Cover_Letter.pdf"]
-
   -- Columnwise custom job details
   mode_of_work         TEXT,
   skills_required      TEXT,
-  important_information TEXT,
-
   notes                TEXT,
+
   created_at           TIMESTAMPTZ DEFAULT NOW(),
   updated_at           TIMESTAMPTZ DEFAULT NOW()
 );

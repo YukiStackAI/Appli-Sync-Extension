@@ -59,7 +59,7 @@ def build_prompt(text: str, url: str) -> str:
   "portal": "LinkedIn | Naukri | Indeed | Company Website",
   "mode_of_work": "hybrid | on-site | work from home",
   "skills_required": "Comma-separated list of key technical and soft skills",
-  "important_information": "Any crucial highlights, instructions, joining time, benefits, etc."
+  "notes": "Any crucial highlights, instructions, joining time, benefits, or important details."
 }}
 
 Page URL: {url}

@@ -137,80 +137,7 @@
   }
 
   // ─── Form Field Tracker ──────────────────────────────────────
-  function startFormTracking() {
-    const SKIP_TYPES = ['password', 'hidden', 'submit', 'button', 'image', 'reset', 'checkbox', 'radio'];
 
-    function captureField(el) {
-      if (SKIP_TYPES.includes(el.type)) return;
-      if (!el.value?.trim()) return;
-
-      const label =
-        el.getAttribute('aria-label') ||
-        el.getAttribute('placeholder') ||
-        el.getAttribute('name') ||
-        el.getAttribute('id') ||
-        el.closest('[class*="field"], [class*="group"], [class*="form"]')
-          ?.querySelector('label')?.innerText ||
-        'Field';
-
-      state.formFields[label.trim()] = el.value.trim();
-    }
-
-    function captureFile(el) {
-      if (el.type !== 'file') return;
-      Array.from(el.files || []).forEach(f => {
-        if (!state.filesSubmitted.includes(f.name)) {
-          state.filesSubmitted.push(f.name);
-          updateOverlayFileCount();
-        }
-      });
-    }
-
-    // Track changes on all form elements
-    const observer = new MutationObserver(() => {
-      document.querySelectorAll('input, textarea, select').forEach(el => {
-        if (el._appliTracked) return;
-        el._appliTracked = true;
-        el.addEventListener('change', () => { captureField(el); captureFile(el); });
-        el.addEventListener('blur',   () => captureField(el));
-      });
-    });
-
-    observer.observe(document.body, { childList: true, subtree: true });
-
-    // Initial scan
-    document.querySelectorAll('input, textarea, select').forEach(el => {
-      el._appliTracked = true;
-      el.addEventListener('change', () => { captureField(el); captureFile(el); });
-      el.addEventListener('blur',   () => captureField(el));
-    });
-  }
-
-  // ─── Submit Detection ────────────────────────────────────────
-  function watchForSubmit() {
-    document.addEventListener('click', async (e) => {
-      const btn = e.target.closest('button, [role="button"], input[type="submit"], a');
-      if (!btn) return;
-
-      const text = (btn.innerText || btn.value || btn.getAttribute('aria-label') || '').toLowerCase();
-      const isSubmit = /submit|apply now|apply|send application|confirm apply/i.test(text);
-      if (!isSubmit) return;
-
-      // Snapshot form fields at submit time
-      document.querySelectorAll('input, textarea, select').forEach(el => {
-        const SKIP = ['password','hidden','submit','button','image','reset','file'];
-        if (SKIP.includes(el.type) || !el.value?.trim()) return;
-        const label = el.getAttribute('aria-label') || el.getAttribute('placeholder') || el.getAttribute('name') || 'Field';
-        state.formFields[label.trim()] = el.value.trim();
-      });
-
-      // Auto-save if overlay has extracted data
-      if (state.extractedData && Object.keys(state.formFields).length > 0) {
-        showOverlayStatus('📋 Form captured! Click Save to store.', 'info');
-        updateOverlayFormBadge();
-      }
-    }, true);
-  }
 
   // ─── Build Overlay ────────────────────────────────────────────
   function buildOverlay() {
@@ -311,10 +238,6 @@
               </div>
             </div>
             <div class="as-field-group">
-              <label>Important Info</label>
-              <input id="as-f-imp" type="text" placeholder="NA"/>
-            </div>
-            <div class="as-field-group">
               <label>Notes</label>
               <input id="as-f-notes" type="text" placeholder="Add notes..."/>
             </div>
@@ -331,16 +254,6 @@
               <textarea id="as-scraped-preview" readonly style="width: 100%; height: 120px; background: rgba(0, 0, 0, 0.25); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 6px; color: rgba(255, 255, 255, 0.7); font-family: monospace; font-size: 11px; padding: 8px; resize: vertical; margin-top: 6px; box-sizing: border-box; outline: none;"></textarea>
             </details>
 
-            <!-- Captured indicators -->
-            <div id="as-captures">
-              <div id="as-form-badge" class="as-badge" style="display:none">
-                📋 <span id="as-form-count">0</span> form fields
-              </div>
-              <div id="as-file-badge" class="as-badge" style="display:none">
-                📎 <span id="as-file-list"></span>
-              </div>
-            </div>
-
             <!-- Save -->
             <button id="as-save" class="as-btn as-btn-save">
               💾 Save Application
@@ -348,117 +261,84 @@
           </div>
 
           <!-- Status message -->
-          <div id="as-status" class="as-status"></div>
-
+          <div id="as-status"></div>
         </div>
-      </div>
 
-      <!-- Minimized pill -->
-      <div id="as-pill" style="display:none">
-        <div id="as-logo-mark-sm">A</div>
-        <span>AppliSync</span>
       </div>
     `;
 
     document.body.appendChild(overlay);
-    initOverlayEvents(overlay);
-    startFormTracking();
-    watchForSubmit();
-    checkAuthState();
-  }
 
-  // ─── Overlay Events ──────────────────────────────────────────
-  function initOverlayEvents(overlay) {
-    // Drag
-    const header = overlay.querySelector('#as-header');
-    header.addEventListener('mousedown', (e) => {
-      if (e.target.closest('button')) return;
-      state.isDragging  = true;
-      const rect = overlay.getBoundingClientRect();
-      state.dragOffset  = { x: e.clientX - rect.left, y: e.clientY - rect.top };
-      overlay.style.transition = 'none';
+    // Bind Auth
+    document.getElementById('as-signin').addEventListener('click', async () => {
+      const e = document.getElementById('as-email').value;
+      const p = document.getElementById('as-pass').value;
+      const err = document.getElementById('as-auth-err');
+      try {
+        const res = await msg('SIGN_IN', { email: e, password: p });
+        if (res.ok) checkAuth();
+        else err.textContent = res.error || 'Failed to sign in';
+      } catch (ex) {
+        err.textContent = 'Network error';
+      }
     });
 
-    document.addEventListener('mousemove', (e) => {
-      if (!state.isDragging) return;
-      const x = e.clientX - state.dragOffset.x;
-      const y = e.clientY - state.dragOffset.y;
-      overlay.style.left   = `${Math.max(0, x)}px`;
-      overlay.style.top    = `${Math.max(0, y)}px`;
-      overlay.style.right  = 'auto';
-      overlay.style.bottom = 'auto';
-    });
-
-    document.addEventListener('mouseup', () => { state.isDragging = false; });
-
-    // Minimize
-    overlay.querySelector('#as-minimize').addEventListener('click', () => {
-      overlay.querySelector('#as-body').style.display = 'none';
-      overlay.querySelector('#as-pill').style.display = 'flex';
-      overlay.querySelector('#as-header-btns').style.display = 'none';
-    });
-
-    overlay.querySelector('#as-pill').addEventListener('click', () => {
-      overlay.querySelector('#as-body').style.display = 'block';
-      overlay.querySelector('#as-pill').style.display = 'none';
-      overlay.querySelector('#as-header-btns').style.display = 'flex';
-    });
-
-    // Close
-    overlay.querySelector('#as-close').addEventListener('click', () => {
+    // Window controls
+    document.getElementById('as-close').addEventListener('click', () => {
       overlay.style.display = 'none';
-      // Restore via extension icon click
+      if (document.getElementById('as-pill')) document.getElementById('as-pill').remove();
     });
 
-    // Sign in
-    overlay.querySelector('#as-signin').addEventListener('click', handleOverlaySignIn);
-    overlay.querySelector('#as-pass').addEventListener('keydown', e => {
-      if (e.key === 'Enter') handleOverlaySignIn();
+    document.getElementById('as-minimize').addEventListener('click', () => {
+      document.getElementById('as-body').style.display = 'none';
+      document.getElementById('as-header').style.display = 'none';
+      
+      const pill = document.createElement('div');
+      pill.id = 'as-pill';
+      pill.innerHTML = `<span>A</span><span>AppliSync</span>`;
+      pill.addEventListener('click', () => {
+        pill.remove();
+        document.getElementById('as-body').style.display = 'flex';
+        document.getElementById('as-header').style.display = 'flex';
+      });
+      document.body.appendChild(pill);
     });
-
-    // Extract
-    overlay.querySelector('#as-extract').addEventListener('click', handleExtract);
 
     // Scrape Only
     overlay.querySelector('#as-scrape').addEventListener('click', handleScrape);
 
+    // Extract
+    overlay.querySelector('#as-extract').addEventListener('click', handleExtract);
+
     // Save
     overlay.querySelector('#as-save').addEventListener('click', handleSave);
+
+    checkAuth();
   }
 
-  // ─── Auth ────────────────────────────────────────────────────
-  async function checkAuthState() {
+  function showOverlayStatus(text, type='info') {
+    const el = document.getElementById('as-status');
+    if (!el) return;
+    el.textContent = text;
+    el.className = `as-status-${type}`;
+  }
+
+  function getField(id) { return document.getElementById(id)?.value?.trim() || null; }
+  function setField(id, val) { 
+    const el = document.getElementById(id);
+    if (el) el.value = val;
+  }
+
+  // ─── Auth Check ───────────────────────────────────────────────
+  async function checkAuth() {
     const res = await msg('GET_SESSION');
-    if (res?.data) {
-      showMain();
-    }
-  }
-
-  async function handleOverlaySignIn() {
-    const email = document.getElementById('as-email').value.trim();
-    const pass  = document.getElementById('as-pass').value;
-    const errEl = document.getElementById('as-auth-err');
-    const btn   = document.getElementById('as-signin');
-
-    errEl.textContent = '';
-    btn.textContent   = 'Signing in...';
-    btn.disabled      = true;
-
-    const res = await msg('SIGN_IN', { email, password: pass });
-
-    btn.textContent = 'Sign In';
-    btn.disabled    = false;
-
-    if (res?.ok) {
-      showMain();
+    if (res?.ok && res.data) {
+      document.getElementById('as-auth-gate').style.display = 'none';
+      document.getElementById('as-main').style.display = 'flex';
     } else {
-      errEl.textContent = res?.error || 'Sign in failed';
+      document.getElementById('as-auth-gate').style.display = 'flex';
+      document.getElementById('as-main').style.display = 'none';
     }
-  }
-
-  function showMain() {
-    document.getElementById('as-auth-gate').style.display = 'none';
-    document.getElementById('as-main').style.display      = 'block';
   }
 
   // ─── Scrape Only (No LLM) ─────────────────────────────────────
@@ -466,16 +346,14 @@
     const btn     = document.getElementById('as-scrape');
     const icon    = document.getElementById('as-scrape-icon');
     const txtEl   = document.getElementById('as-scrape-text');
-    const results = document.getElementById('as-scrape-results');
+    const resEl   = document.getElementById('as-scrape-results');
+    const outEl   = document.getElementById('as-scrape-output');
     const metaEl  = document.getElementById('as-scrape-meta');
-    const output  = document.getElementById('as-scrape-output');
-    const statusEl = document.getElementById('as-status');
 
-    icon.textContent     = '⏳';
-    txtEl.textContent    = 'Scraping page...';
+    icon.style.animation = 'as-spin 1s linear infinite';
+    txtEl.textContent    = 'Scraping...';
     btn.disabled         = true;
-    statusEl.textContent = '';
-
+    
     try {
       const html = getPageHTML();
       const htmlSize = new Blob([html]).size;
@@ -484,50 +362,36 @@
       if (!res?.ok) throw new Error(res?.error || 'Scrape failed');
 
       const d = res.data;
-
-      // Show metadata
+      
+      resEl.style.display = 'flex';
+      outEl.value = d.scraped_text || 'No text extracted.';
+      
       metaEl.innerHTML = `
-        <div class="as-meta-row"><span class="as-meta-label">Portal</span><span class="as-meta-value">${d.portal}</span></div>
-        <div class="as-meta-row"><span class="as-meta-label">URL</span><span class="as-meta-value as-meta-url">${location.hostname}${location.pathname.slice(0, 40)}</span></div>
-        <div class="as-meta-row"><span class="as-meta-label">HTML Sent</span><span class="as-meta-value">${(htmlSize / 1024).toFixed(1)} KB</span></div>
-        <div class="as-meta-row"><span class="as-meta-label">Text Extracted</span><span class="as-meta-value as-meta-highlight">${d.char_count.toLocaleString()} chars</span></div>
+        <div><strong>Portal:</strong> ${d.portal}</div>
+        <div><strong>HTML Size Sent:</strong> ${(htmlSize / 1024).toFixed(1)} KB</div>
+        <div><strong>Chars Extracted:</strong> ${d.char_count.toLocaleString()}</div>
       `;
-
-      // Show raw text
-      output.value = d.scraped_text || '(empty — no text extracted)';
-      results.style.display = 'block';
 
       if (d.char_count > 200) {
         showOverlayStatus(`✅ Scraped ${d.char_count.toLocaleString()} chars from ${d.portal}`, 'success');
       } else {
         showOverlayStatus(`⚠️ Only ${d.char_count} chars extracted — page may need different selectors`, 'info');
       }
-
     } catch (e) {
       showOverlayStatus('❌ ' + e.message, 'error');
     } finally {
-      icon.textContent  = '🔍';
-      txtEl.textContent = 'Re-Scrape · Raw Text Only';
-      btn.disabled      = false;
+      icon.style.animation = '';
+      txtEl.textContent    = 'Re-Scrape · Raw Text Only';
+      btn.disabled         = false;
     }
   }
 
   // ─── Extract ─────────────────────────────────────────────────
   async function handleExtract() {
-    if (state.isExtracting) return;
-    state.isExtracting = true;
-
     const btn     = document.getElementById('as-extract');
-    const icon    = document.getElementById('as-extract-icon');
-    const txtEl   = document.getElementById('as-extract-text');
     const fields  = document.getElementById('as-fields');
-    const statusEl= document.getElementById('as-status');
 
-    icon.style.animation = 'as-spin 1s linear infinite';
-    txtEl.textContent    = 'Extracting...';
-    btn.disabled         = true;
-    statusEl.textContent = '';
-
+    btn.disabled = true;
     try {
       const html = getPageHTML();
       const res  = await msg('EXTRACT_PAGE', { html, url: location.href });
@@ -535,9 +399,7 @@
       if (!res?.ok) throw new Error(res?.error || 'Extraction failed');
 
       const d = res.data;
-      state.extractedData = { ...d, portal: detectPortal(), job_url: location.href };
-
-      // Populate fields
+      
       setField('as-f-company', d.company || 'NA');
       setField('as-f-role',    d.role || 'NA');
       setField('as-f-exp',     d.experience_required || 'Fresher');
@@ -546,30 +408,19 @@
       setField('as-f-date',    d.posting_date || 'NA');
       setField('as-f-mode',    d.mode_of_work || 'NA');
       setField('as-f-skills',  d.skills_required || 'NA');
-      setField('as-f-imp',     d.important_information || 'NA');
+      setField('as-f-notes',   d.notes || '');
 
       if (d.job_description) {
         document.getElementById('as-jd-preview').textContent = d.job_description.slice(0, 600) + '...';
         document.getElementById('as-jd-chars').textContent   = `(${d.job_description.length} chars)`;
       }
 
-      if (d.scraped_text) {
-        const scrPreview = document.getElementById('as-scraped-preview');
-        const scrChars = document.getElementById('as-scraped-chars');
-        if (scrPreview) scrPreview.value = d.scraped_text;
-        if (scrChars) scrChars.textContent = `(${d.scraped_text.length} chars)`;
-      }
-
       fields.style.display = 'block';
-      showOverlayStatus('✅ Extracted! Review and save.', 'success');
-
+      showOverlayStatus('✅ Extracted!', 'success');
     } catch (e) {
       showOverlayStatus('❌ ' + e.message, 'error');
     } finally {
-      icon.style.animation = '';
-      txtEl.textContent    = 'Re-Extract';
-      btn.disabled         = false;
-      state.isExtracting   = false;
+      btn.disabled = false;
     }
   }
 
@@ -579,44 +430,6 @@
     btn.textContent = '⟳ Saving...';
     btn.disabled    = true;
 
-    // Build beautiful consolidated notes line-by-line
-    const notesParts = [];
-
-    // 1. Manual User Notes
-    const manualNotes = getField('as-f-notes')?.trim();
-    if (manualNotes) {
-      notesParts.push(`📝 Notes:\n${manualNotes}`);
-    }
-
-
-
-    // 3. User Filled Form Fields
-    if (state.formFields && Object.keys(state.formFields).length > 0) {
-      const formLines = ["📋 Form Details Filled:"];
-      for (const [key, value] of Object.entries(state.formFields)) {
-        if (value && value.trim()) {
-          formLines.push(`   • ${key}: ${value.trim()}`);
-        }
-      }
-      if (formLines.length > 1) {
-        notesParts.push(formLines.join('\n'));
-      }
-    }
-
-    // 4. Uploaded Files
-    if (state.filesSubmitted && state.filesSubmitted.length > 0) {
-      const fileLines = ["📎 Attached Files:"];
-      state.filesSubmitted.forEach(f => {
-        if (f) fileLines.push(`   • ${f}`);
-      });
-      if (fileLines.length > 1) {
-        notesParts.push(fileLines.join('\n'));
-      }
-    }
-
-    const compiledNotes = notesParts.join('\n\n') || null;
-
-    // Read edited fields from overlay inputs
     const data = {
       portal:              detectPortal(),
       company:             getField('as-f-company'),
@@ -627,12 +440,9 @@
       posting_date:        getField('as-f-date'),
       job_description:     state.extractedData?.job_description || null,
       job_url:             location.href,
-      notes:               compiledNotes,
-      mode_of_work:          getField('as-f-mode'),
-      skills_required:       getField('as-f-skills'),
-      important_information: getField('as-f-imp'),
-      form_fields:         state.formFields,
-      files_submitted:     state.filesSubmitted,
+      notes:               getField('as-f-notes'),
+      mode_of_work:        getField('as-f-mode'),
+      skills_required:     getField('as-f-skills'),
     };
 
     const res = await msg('SAVE_APPLICATION', { data });
@@ -640,11 +450,6 @@
     if (res?.ok) {
       showOverlayStatus('✅ Saved to AppliSync!', 'success');
       btn.textContent = '✅ Saved!';
-      // Reset form tracking for next page
-      state.formFields    = {};
-      state.filesSubmitted= [];
-      updateOverlayFormBadge();
-      updateOverlayFileCount();
     } else {
       showOverlayStatus('❌ ' + (res?.error || 'Save failed'), 'error');
       btn.textContent = '💾 Save Application';
@@ -670,31 +475,6 @@
     el.className    = `as-status as-status--${type}`;
     el.style.display= 'block';
     if (type === 'success') setTimeout(() => { el.style.display = 'none'; }, 5000);
-  }
-
-  function updateOverlayFormBadge() {
-    const count = Object.keys(state.formFields).length;
-    const badge = document.getElementById('as-form-badge');
-    const cnt   = document.getElementById('as-form-count');
-    if (!badge) return;
-    if (count > 0) {
-      badge.style.display = 'flex';
-      cnt.textContent     = count;
-    } else {
-      badge.style.display = 'none';
-    }
-  }
-
-  function updateOverlayFileCount() {
-    const badge = document.getElementById('as-file-badge');
-    const list  = document.getElementById('as-file-list');
-    if (!badge) return;
-    if (state.filesSubmitted.length > 0) {
-      badge.style.display = 'flex';
-      list.textContent    = state.filesSubmitted.join(', ');
-    } else {
-      badge.style.display = 'none';
-    }
   }
 
   function msg(type, payload = {}) {
